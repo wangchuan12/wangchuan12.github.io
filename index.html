@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>asd</title>
+        
+    <link
+    rel="stylesheet"
+    href="https://js.arcgis.com/4.15/esri/themes/dark/main.css"
+  />
+  <script src="https://js.arcgis.com/4.15/"></script>
+        <style>
+            html,body{
+                height: 100%;
+                width: 100%
+            }
+            #a{
+                height: 6%;
+                width: 97%;
+                background-color:rgb(20, 7, 2);
+                float: left;
+            }
+            #b{
+                height: 89%;
+                width: 100%;
+                float: left;
+            
+            }
+ 
+            #d{
+                height: 5%;
+                width: 60%;
+                background-color:dimgray;
+                float: left;
+            }
+            #f{
+                height: 6%;
+                width: 3%;
+                float: left;
+            
+            }
+            #c{
+
+                height: 5%;
+                width: 40%;
+                float: left;
+            }
+            h3{
+                position: absolute;
+                top: 0px;
+                color: oldlace;
+            }
+            
+        </style>
+        <script>
+            require([
+        "esri/Map",
+        "esri/views/MapView",
+        "esri/widgets/BasemapToggle",
+        "esri/widgets/BasemapGallery",
+        "esri/layers/FeatureLayer",
+        "esri/widgets/Legend",
+        "esri/widgets/ScaleBar",
+        "esri/widgets/Search",
+        "esri/widgets/Expand",
+        "esri/widgets/Compass",
+        "esri/widgets/Home",
+        "esri/widgets/Locate"
+      ],
+            function(map,mapview,www,BasemapGallery,FeatureLayer,Legend,ScaleBar,search,expand,Compass,Home
+            ,Locate){
+                var s = new map({
+                    basemap:"streets-night-vector"
+                });
+                var ss = new mapview({
+                    container:"b",
+                    map:s,
+                    center:[107.491833,32.19335],
+                    zoom:3
+                });
+                var feature = new FeatureLayer(
+                    {
+                        url:"http://www.arcgisonline.cn/server/rest/services/Hosted/%E4%BA%BA%E5%9D%87%E7%BB%BF%E5%9C%B0%E9%9D%A2%E7%A7%AF%E5%8F%98%E5%8C%96%E6%A6%82%E5%86%B5/FeatureServer"
+                    }
+                )
+                //s.layers.add(feature)
+                s.add(feature)
+                
+                var legend = new Legend({
+                    view : ss,
+                    layerInfos: [{
+                         layer: feature,
+                          title: "中国人均绿地面积变化"
+                          }],
+                    style:"card",
+                    layout:"side-by-side"
+                       })
+                    
+                var scaleBar = new ScaleBar({
+                    view:ss,
+                    style:"ruler",
+                    unit:"non-metric"
+                })
+                ss.ui.add(scaleBar,{position:"bottom-left"})
+                var coordsWidget = document.getElementById("c")
+                    coordsWidget.className = "esri-widget esri-component";
+                    coordsWidget.style.padding = "7px 15px 5px";
+                    //coordsWidget.style.backgroundColor="cadetblue"
+                   // ss.ui.add(coordsWidget, "bottom-right");
+                    function showCoordinates(pt) {
+                            var coords = "维度 " + pt.latitude.toFixed(3) + "经度 " + pt.longitude.toFixed(3) +
+                                  " | Scale 1:" + Math.round(ss.scale * 1) / 1 +
+                                  " | Zoom " + ss.zoom;
+                            coordsWidget.innerHTML = coords;}
+                            ss.watch("stationary", function(isStationary) {
+                                showCoordinates(ss.center);
+                                  });
+
+                                  ss.on("pointer-move", function(evt) {
+                                  showCoordinates(ss.toMap({ x: evt.x, y: evt.y }));
+                                              });
+                            var ser = new search({
+                                             view :ss
+                                         })
+                            var compass = new Compass({
+                                view:ss
+                            })
+                            var home = new Home({
+                                view:ss
+                            })
+                            var locate = new Locate({
+                                view:ss
+                            })
+                            ss.ui.add(locate,"top-left")
+                            ss.ui.add(home,"top-left")
+                            ss.ui.add(compass,"top-left")
+                           ss.ui.add([new expand({
+                               view:ss,
+                               content:ser,
+                               group:"top-left"
+                           }),new expand({
+                               view:ss,
+                               content:new BasemapGallery({
+                                   view:ss,
+                                   source:{
+                                       portal:{
+                                           url: "https://www.arcgis.com",
+                                           useVectorBasemaps: true
+                                       }
+                                   }
+                               }),
+                               group:"top-left"
+                           }),,new expand({
+                               view:ss,
+                               content:legend,
+                               group:"top-left"
+                           })],"top-right")
+                /*
+                var w = new BasemapGallery({
+                    view:ss,
+                    source:{
+                        portal:{
+                            url:"https://www.arcgis.com",
+                            useVectorBasemaps: false
+                        }
+                    }
+                })
+                ss.ui.add(w,"top-right")
+            var w = new www({
+                        view: ss,
+                        nextBasemap: "hybrid"
+                    });
+                */
+
+            });
+                  
+        </script>
+        <script>
+
+            function show(){
+                var timea = ""
+                var wenhou = ""
+                var da = new Date()
+                var h = da.getHours()
+                var m = da.getMinutes()
+                var s = da.getSeconds()
+                var mo = da.getUTCMonth()+1
+                var y = da.getFullYear()
+                var d = da.getUTCDate()
+                timea =y+"年  "+mo+"月 "+d+"日 "+ h+":"+m+":"+s
+                if(h>=8 && h< 12){
+                    wenhou = "早上好"
+                }
+                if(h>=12 && h < 14){
+                    wenhou = "中午好"
+                }
+                if(h>=14 && h<17){
+                    wenhou = "下午好"
+                }
+                if(h>=17 && h<24){
+                    wenhou = "晚上好"
+                }
+                setTimeout("show()",1000)
+                document.getElementById("d").innerHTML=wenhou+"现在的时间是："+timea
+            }
+            show()
+        </script>
+
+    </head>
+    <body>
+        <div id="f">
+            <img src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=3877680038,3626620462&fm=26&gp=0.jpg" alt="图片出错" width="100%" height="100%"/>
+        </div>
+        <div id="a">
+            <h3> 中国人均绿地面积近年变化</h3>
+        </div>
+        <div id="b"></div>
+        <div id="d"></div>
+        <div id="c"></div>
+    </body>
+</html>
