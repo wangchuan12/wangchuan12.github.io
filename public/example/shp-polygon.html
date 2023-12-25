@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- <script src="https://unpkg.com/three@0.159.0/build/three.module.js"></script>
+    <script src="https://unpkg.com/three@0.159.0//examples/jsm/"></script> -->
+    <style>
+        html, body ,#container{
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+    <script src="https://unpkg.com/three@0.159.0/build/three.min.js"></script>
+    <script src="../build/three-shp-render.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.131.2/examples/js/controls/OrbitControls.js"></script>
+    <script>
+        const container = document.getElementById('container')
+        const {ShpFileRender , ShapeOption} = ThreeShpRender
+        const clock = new THREE.Clock();
+        const renderer = new THREE.WebGLRenderer( { antialias: true ,  logarithmicDepthBuffer : true} );
+        renderer.setPixelRatio( window.devicePixelRatio );
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        container.appendChild( renderer.domElement );
+
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.shadowMap.enabled = true;
+        const scene = new THREE.Scene();
+
+        const camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.5, 1000000 );
+        camera.position.set(-4874.021470855053, 4133.281652538446, 6500.676402522459)
+        const controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+        window.camera = camera
+        const initLight= ()=>{
+              const light = new THREE.DirectionalLight(0xffffff, 0.5);
+              light.position.set(200, 200, 200);
+              light.lookAt(new THREE.Vector3(0 , 0 , 0))
+              scene.add(light)
+              scene.add(new THREE.AmbientLight(0xe0f7fa, 0.5))
+
+            }
+        initLight()
+        const getLinerColor = ()=>{
+            const c=  document.createElement("canvas")
+            const ctx=c.getContext("2d");
+            const jb=ctx.createLinearGradient(0,0,100,0);
+            jb.addColorStop(0, '#ffd89b');
+            jb.addColorStop(1, "#19547b");
+            ctx.fillStyle=jb;
+            ctx.fillRect(0,0,255 ,1);
+            return ctx 
+        }
+        const ctx = getLinerColor()
+        const stet = 255 / 30
+        const heightMap2 = new Array(30).fill(0).map((item , index)=>{
+        const color = ctx.getImageData(index * stet , 0 , 1 , 1)
+        return {
+            range : [index * 10 , (index + 1) * 10 ],
+            color : `rgb(${color.data[0]} , ${color.data[1]},${color.data[2]})`
+        }
+        })
+        const baseOption = {
+            ...ShapeOption,
+            url : `http://${location.host}/public/data/polygon.zip`,
+            polygonStyleCallBack : (fe)=>{
+            const color = heightMap2.find((item)=>{return item.range[0] <= fe.properties.Elevation && item.range[1] >= fe.properties.Elevation})?.color || 'rgb(91,153,150)'
+            return {
+                color : color,
+                extrudeHeight : fe.properties.Elevation
+            }
+            }
+        }
+        baseOption.style.point.size = 50
+        baseOption.style.point.sizeAttenuation = false
+        baseOption.style.point.color = "yellow"
+        baseOption.style.polyline.color = 'rgb(10 , 124 , 25)'
+        baseOption.style.polyline.lineWidth = 3
+        baseOption.style.polygon.color= 'rgb(255 ,255, 255)'
+        console.time('loadTime')
+        const shpPolygon = new ShpFileRender( baseOption)
+        shpPolygon.init().then(()=>{
+            shpPolygon.toOrigin()
+            scene.add(shpPolygon)
+            console.timeEnd('loadTime')
+        })
+
+
+        window.onresize = function () {
+
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+
+            renderer.setSize( window.innerWidth, window.innerHeight );
+
+        };
+
+
+        function animate() {
+
+            requestAnimationFrame( animate );
+
+            const delta = clock.getDelta();
+
+            controls.update();
+
+            renderer.render( scene, camera );
+
+        }
+
+        animate()    
+    </script>
+</body>
+</html>
