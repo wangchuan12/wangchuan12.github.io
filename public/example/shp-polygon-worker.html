@@ -69,7 +69,7 @@
         const baseOption = {
             ...ShapeOption,
             useWorker : true,
-            url : `http://${location.host}/public/data/shanghai_part.zip`,
+            url : `https://${location.host}/public/data/shanghai_part.zip`,
             polygonStyleCallBack : (fe)=>{
             const color = heightMap2.find((item)=>{return item.range[0] <= fe.properties.Elevation && item.range[1] >= fe.properties.Elevation})?.color || 'rgb(91,153,150)'
             return {
