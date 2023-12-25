@@ -71,7 +71,7 @@
 
         const baseOption = {
             ...ShapeOption,
-            url : `http://${location.host}/public/data/point.zip`,
+            url : `https://${location.host}/public/data/point.zip`,
             pointStyleCallBack : (fe)=>{
                 const item = colorSizeMap[Math.floor(Math.random() * 30)]
                 return {
@@ -80,7 +80,7 @@
                 }
             },
         }
-        baseOption.style.point.map = `http://${location.host}/public/tex/spark1.png`
+        baseOption.style.point.map = `https://${location.host}/public/tex/spark1.png`
         baseOption.style.point.size = 4
         baseOption.style.point.sizeAttenuation = false
         baseOption.style.point.color ='rgb(255 , 255, 255)'
